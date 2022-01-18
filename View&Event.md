@@ -34,8 +34,109 @@ View({ owner: Address })
 
 ### 示例
 
+[index.rsh](View/index.rsh)
+
+```js
+//一个模块以'reach 0.1'开头；随后是一系列导入和标识符定义
+'reach 0.1';
+
+//声明合约地址最大长度
+const BS = Bytes(48);
+const MA = Maybe(Address);
+const MBS = Maybe(BS);
+
+export const main = Reach.App(
+  {},
+  //定义参与者为Alice，参与者交互接口包括了NFT和checkView字段
+  //在这个程序中，Reach 后端调用前端交互函数，checkView 与程序中每个点的视图的期望值。前端将该值与返回的值进行比较
+  //使用了Fun([Domain_0, ..., Domain_N], Range)函数
+  [ Participant('Alice', {
+      NFT: BS,
+      checkView: Fun([Tuple(MA, MBS)], Null),
+    }),
+    //使用View(viewName, viewInterface)来定义视图
+    View('Main', {
+      who: Address,
+      NFT: BS,
+    }),
+  ],
+  (A, vMain) => {
+  //通过.publish 组件发布新数据
+  //提交语句，写成 commit();，提交语句的延续，作为 DApp 计算的下一步。换句话说，它结束了当前的共识步骤并允许更多的本地步骤。
+    A.publish(); commit();
+    //interact.KEY是一个交互表达式，KEY在参与者交互接口中绑定到一个非函数类型即checkView，此处会计算使用者地址和NFT的评估，并发送一个值到前端
+    A.only(() => interact.checkView([MA.None(), MBS.None()]));
+
+    A.only(() => {
+      const NFT = declassify(interact.NFT); });
+    A.publish(NFT);
+    //给who和NFT注入值
+    vMain.who.set(A);
+    vMain.NFT.set(NFT);
+    commit();
+    //1.有地址也有NFT
+    A.only(() => interact.checkView([MA.Some(A), MBS.Some(NFT)]));
+
+    A.publish();
+    vMain.who.set();
+    commit();
+    //2.没有地址但是有NFT
+    A.only(() => interact.checkView([MA.None(), MBS.Some(NFT)]));
+
+    A.publish();
+    vMain.who.set(A);
+    vMain.NFT.set();
+    commit();
+    //3.有地址但是没有NFT
+    A.only(() => interact.checkView([MA.Some(A), MBS.None()]));
+
+    A.publish();
+    commit();
+
+    //4.没有地址也没有NFT
+    A.only(() => interact.checkView([MA.None(), MBS.None()]));
+
+    //退出语句，写成 exit();停止计算。
+    exit();
+  }
+);
+
 ```
 
+[index.mjs](View/index.mjs)
+
+```js
+import { loadStdlib } from '@reach-sh/stdlib';
+import * as backend from './build/index.main.mjs';
+
+(async () => {
+  const stdlib = await loadStdlib();
+    //声明assertEq(expected, actual)函数
+  const assertEq = (expected, actual) => {
+    const exps = JSON.stringify(expected);
+    const acts = JSON.stringify(actual);
+    console.log('assertEq', {expected, actual}, {exps, acts});
+    stdlib.assert(exps === acts) };
+  const startingBalance = stdlib.parseCurrency(100);
+    //创建了测试账户
+  const accAlice = await stdlib.newTestAccount(startingBalance);
+    //部署了该应用程序
+  const ctcAlice = accAlice.contract(backend);
+
+  const checkView = async (expected) => {
+    console.log('checkView', expected);
+    //前端将期望值与后端返回的值进行比较
+      assertEq(expected, [
+      await ctcAlice.v.Main.who(),
+      await ctcAlice.v.Main.NFT(),
+    ])};
+
+  const NFT = `This is a test NFT`;
+  await Promise.all([
+    backend.Alice(ctcAlice, { NFT, checkView }),
+  ]);
+
+})();
 ```
 
 
@@ -76,8 +177,133 @@ Logger.log(4, x);
 
 ### 示例
 
+[index.mjs](Event/index.mjs)
+
+```js
+import {loadStdlib} from '@reach-sh/stdlib';
+import * as backend from './build/index.main.mjs';
+const stdlib = loadStdlib(process.env);
+
+// 验证２个是否相等
+const assertEq = (a, b) => {
+  // 不相等就抛出一个错误：期望相等
+  if (!a.eq(b)) {
+    throw Error(`Expected ${JSON.stringify(a)} == ${JSON.stringify(b)}`);
+  }
+}
+
+(async () => {
+  // 新建一个用户并与后端关联
+  const startingBalance = stdlib.parseCurrency(100);
+  const accAlice = await stdlib.newTestAccount(startingBalance);
+  const ctcAlice = accAlice.contract(backend);
+
+  // 将后端event对象赋值给e
+  const e = ctcAlice.events;
+
+  // 生成一个BigNumber类型，初始为０
+  let x = stdlib.bigNumberify(0);
+
+  // 定义查看Event对象的方法
+  const getLog = (f) => async () => {
+    // 接收Event返回的时间和元素，分别赋值给when,what
+    const { when, what } = await f.next();
+    // 接收Event最近的发生时间
+    const lastTime = await f.lastTime();
+    // 判断是否相等
+    assertEq(lastTime, when);
+
+    // 输出时间
+    console.log(JSON.stringify(when));
+
+    return what;
+  }
+
+  // 定义查看Event中x元素的方法
+  const getXLog = getLog(e.x_event.x);
+
+  await Promise.all([
+    backend.A(ctcAlice, {
+      // 实现getX()函数，返回x＋１
+      getX: () => x = x.add(1),
+      // 实现show()函数，用来显示每次x_event.x的值
+      show: async () => {
+        const what = await getXLog();
+        assertEq(what[0], x);
+        
+        // 输出x_event中x的值
+        console.log(JSON.stringify(what[0]));
+        // 换行
+        console.log(" ");
+      },
+    }),
+  ]);
+
+})();
 ```
 
+[index.rsh](Event/index.rsh)
+
+```js
+'reach 0.1';
+'use strict';
+
+export const main = Reach.App(() => {
+  // 接口中定义２个方法
+  const A = Participant('A', {
+    getX: Fun([], UInt),
+    show: Fun([], Null),
+  });
+  // 定义事件，并取名为x_event
+  const E = Events('x_event', {
+    x: [UInt],
+  });
+
+  init();
+
+  A.publish();
+
+  // 声明一个xl变量用来判定循环是否继续
+  var [ xl ] = [ 0 ];
+  invariant(balance() == 0);
+  while (xl < 5) {
+    commit();
+    A.only(() => {
+      // 解密从前端获取的x
+      const x = declassify(interact.getX());
+    });
+    A.publish(x);
+
+    // 将x传入x_event
+    E.x(x);
+    A.interact.show();
+
+    [ xl ] = [ x ];
+    continue;
+  }
+
+  commit();
+
+});
+```
+
+终端输出（[index.txt](Event/index.txt)）：
+
+```she
+{"type":"BigNumber","hex":"0x4c"}
+{"type":"BigNumber","hex":"0x01"}
+ 
+{"type":"BigNumber","hex":"0x4d"}
+{"type":"BigNumber","hex":"0x02"}
+ 
+{"type":"BigNumber","hex":"0x4e"}
+{"type":"BigNumber","hex":"0x03"}
+ 
+{"type":"BigNumber","hex":"0x4f"}
+{"type":"BigNumber","hex":"0x04"}
+ 
+{"type":"BigNumber","hex":"0x50"}
+{"type":"BigNumber","hex":"0x05"}
 ```
 
 
