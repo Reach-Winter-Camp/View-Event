@@ -10,6 +10,8 @@
 
 ### View定义
 
+[原文链接](https://docs.reach.sh/rsh/appinit/#ref-programs-appinit-view)
+
 有2种形式来定义 `view` ，下面是2个简单的例子：
 
 ```js
@@ -25,6 +27,8 @@ View({ owner: Address })
 在 DApp 中，此应用程序参数的结果称为 `View` 对象。
 
 ### View对象
+
+[原文链接](https://docs.reach.sh/rsh/consensus/#ref-programs-consensus-view)
 
 如果 `View` 是一个视图对象，那么它的字段就是相关视图的元素。
 
@@ -149,6 +153,8 @@ import * as backend from './build/index.main.mjs';
 
 ### Event定义
 
+[原文链接](https://docs.reach.sh/rsh/appinit/#ref-programs-appinit-events)
+
 有2种形式来定义 `Event` ：
 
 ```js
@@ -168,6 +174,8 @@ Events({
 在 DApp 中，此应用程序参数的结果称为 `Event` 对象。
 
 ### Event对象
+
+[原文链接](https://docs.reach.sh/rsh/consensus/#ref-programs-consensus-events)
 
 ```js
 Logger.log(4, x);
