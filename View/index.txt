@@ -1,0 +1,85 @@
+checkView [ [ 'None', null ], [ 'None', null ] ]
+assertEq {
+  expected: [ [ 'None', null ], [ 'None', null ] ],
+  actual: [ [ 'None', null ], [ 'None', null ] ]
+} {
+  exps: '[["None",null],["None",null]]',
+  acts: '[["None",null],["None",null]]'
+}
+checkView [
+  [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+  [
+    'Some',
+    'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+  ]
+]
+assertEq {
+  expected: [
+    [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+    [
+      'Some',
+      'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    ]
+  ],
+  actual: [
+    [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+    [
+      'Some',
+      'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    ]
+  ]
+} {
+  exps: '[["Some","0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146"],["Some","This is a test NFT\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"]]',
+  acts: '[["Some","0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146"],["Some","This is a test NFT\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"]]'
+}
+checkView [
+  [ 'None', null ],
+  [
+    'Some',
+    'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+  ]
+]
+assertEq {
+  expected: [
+    [ 'None', null ],
+    [
+      'Some',
+      'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    ]
+  ],
+  actual: [
+    [ 'None', null ],
+    [
+      'Some',
+      'This is a test NFT\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    ]
+  ]
+} {
+  exps: '[["None",null],["Some","This is a test NFT\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"]]',
+  acts: '[["None",null],["Some","This is a test NFT\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"]]'
+}
+checkView [
+  [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+  [ 'None', null ]
+]
+assertEq {
+  expected: [
+    [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+    [ 'None', null ]
+  ],
+  actual: [
+    [ 'Some', '0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146' ],
+    [ 'None', null ]
+  ]
+} {
+  exps: '[["Some","0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146"],["None",null]]',
+  acts: '[["Some","0x48EB67b90a24aDA22b3E93B522bD3FBb7770C146"],["None",null]]'
+}
+checkView [ [ 'None', null ], [ 'None', null ] ]
+assertEq {
+  expected: [ [ 'None', null ], [ 'None', null ] ],
+  actual: [ [ 'None', null ], [ 'None', null ] ]
+} {
+  exps: '[["None",null],["None",null]]',
+  acts: '[["None",null],["None",null]]'
+}
